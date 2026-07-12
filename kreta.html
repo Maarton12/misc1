@@ -1,0 +1,1697 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <title>KR&#201;TA Iskolai Alaprendszer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://www.google-analytics.com/" crossorigin>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+
+    <!-- Iskolaőr üzenetküldéshez kell -->
+    <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-app.js"></script>
+    <!-- <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-analytics.js"></script> -->
+    <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-firestore.js"></script>
+
+    <link href="/App_Themes/css?v=I4E4d3qyfTw3zoyPkS4duazQh-Bd_mFSNwVwKTUwuIc1" rel="stylesheet"/>
+<link href="/Content/css?v=QOk49zR81AGe5_udN8HEDzWOeMsLhss7-_h6qQtag7c1" rel="stylesheet"/>
+<link href="/Content/kretaControls?v=NkcZD4xfLC2ZqLRFbwtaKwUjijFL6KlcGlaAQR1a3fc1" rel="stylesheet"/>
+
+    <link href="/Content/kretaCss?v=ivH1_XQd1ORR7aE4zqbnao0RBgx424VWvb5mPJnkhKU1" rel="stylesheet"/>
+
+
+
+    <script src="/bundles/jquery?v=I7FYc7uUyUQRigvFtHATTtPKObg9rR_X9HnduBwjLUc1"></script>
+
+    <script src="/bundles/bootstrap?v=eQkPpIj9AI2c9PR5K4ZfhXhYjA4pDCwBTEIKbEgFIBw1"></script>
+
+    <script src="/bundles/ErrorHandler?v=2xIzhvIuhN7OSA30vAU8NwiA4_JOKuqVb9Xg6Gd4PGs1"></script>
+
+    <script src="/bundles/js?v=LjzKHlZ8ETwgJkwBAFtvlNNRQnfxSs8CeSPfCZI69501"></script>
+
+    <script src="/bundles/moment?v=Zp1pZ5N2VeZJWT_efpUgYvyvsolX4DTl17SuY-hemV01"></script>
+
+    <script src="/bundles/document-register-element?v=rCcXVBAw3r7hA26TyvTQJ24Y4ju-YjKubCkVxlkDvNs1"></script>
+
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-110080867-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-110080867-4');
+</script>
+
+    <style>
+        .usermenu ul.dropdown-menu i {
+            width: 15px;
+            height: 15px;
+        }
+    </style>
+
+    <script type="text/javascript">
+        var UrlHelper = {
+            AppPath: '/',
+            CurrentArea: 'TanuloErtekeles',
+            CurrentControl: 'Osztalyzatok',
+            CurrentControlPath: '/TanuloErtekeles/Osztalyzatok',
+            GetLayoutInformationPath: '/Layout/GetLayoutInformation',
+            RemainingTime: '/Layout/GetRemainingTime',
+            ExtendTime: '/Layout/ExtendSessionTime',
+            LogOutPath: '/Home/LogOut',
+            SajatAdatlapPopUp: '/Adminisztracio/Profil/SajatAdatlapPopUp',
+            DashboardPopup: '/Layout/DashboardUzenetPopup',
+            IskolaorUzenetKuldesPopup : '/Layout/OpenIskolaorUzenetKuldesPopup'
+        };
+
+        $(document).ready(function () {
+            JiraRestHelper.urls = {
+                UgyfelSzolgalatPopUp: '/UgyfelSzolgalat/UgyfelSzolgalat/UgyfelSzolgalatPopUp',
+                BejelentesPopUp: '/UgyfelSzolgalat/UgyfelSzolgalat/BejelentesPopUp',
+                KommunikaciosPopUp: '/UgyfelSzolgalat/UgyfelSzolgalat/KommunikaciosPopUp',
+                CreateCommentToBejegyzes: "/api/UgyfelSzolgalatApi/CreateCommentToBejegyzes",
+                CreateBejelentes: "/api/UgyfelSzolgalatApi/CreateBejelentes",
+                CreateDbVisszaallitas: "/api/UgyfelszolgalatApi/CreateDbVisszaallitas",
+                CreateUjUrlIgenyles: "/api/UgyfelszolgalatApi/CreateUjUrlIgenyles",
+                CreateKonferenciaJelentkezes: "/api/UgyfelszolgalatApi/CreateKonferenciaJelentkezes"
+            };
+
+            JiraRestHelper.popUpTitles =
+            {
+                UgyfelSzolgalat: { title: "UgyfelSzolgalatWindow", text: "UgyfelSzolgalat" },
+                Bejelentes: { title: "BejelentesWindow", text: "Bejelentes" },
+                Kommunikacios: { title: "KommunikaciosWindow", text: "Kommunikacios" }
+            };
+        });
+
+        GlobalErrorHandler('/Layout/ClientError');
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(document).keydown(function (e) {
+                if ($("#KretaProgressBar").hasClass("isOverlayActiv")) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            var ajaxError401RedirectInProgress = false;
+            var ajaxCallCount = 0;
+
+            $.ajaxSetup({
+                async: true,
+                cache: false,
+                beforeSend: function (xhr, settings) {
+                    var requestUrl = settings && settings.url ? settings.url : '';
+                    // A kérés URL-jét egy <a> elemmel oldjuk fel: ez relatív és abszolút URL-t is kezel,
+                    // és ES5/IE11 alatt is működik (a new URL konstruktor IE11-ben nem elérhető).
+                    var linkParser = document.createElement('a');
+                    linkParser.href = requestUrl;
+                    // Csak a tényleges hostot vetjük össze, nem a // jelenlétét, így a query stringben lévő
+                    // teljes URL (pl. /api/foo?returnUrl=https://foo.hu) nem minősül tévesen cross-originnak.
+                    var isSameOriginRequest = !linkParser.host || linkParser.host === window.location.host;
+                    if (!isSameOriginRequest) {
+                        return;
+                    }
+
+                    // Minden saját domaines AJAX kéréshez elküldjük az aktuálisan kiválasztott tanévet.
+                    var tanevId = sessionStorage.getItem('SelectedTanevId');
+                    if (tanevId) {
+                        xhr.setRequestHeader('X-Selected-TanevId', tanevId);
+                    }
+
+                    var tanevSorszam = sessionStorage.getItem('SelectedTanevSorszam');
+                    if (tanevSorszam) {
+                        xhr.setRequestHeader('X-Selected-TanevSorszam', tanevSorszam);
+                    }
+
+                    var tanevNev = sessionStorage.getItem('SelectedTanevNev');
+                    if (tanevNev) {
+                        xhr.setRequestHeader('X-Selected-TanevNev', tanevNev);
+                    }
+                }
+            });
+
+            $(document).ajaxSend(function () {
+                if (AjaxHelper) {
+                    ajaxCallCount++;
+                    AjaxHelper.ShowIndicator();
+                }
+            });
+
+            $(document).ajaxComplete(function () {
+                if (AjaxHelper && !ajaxError401RedirectInProgress) {
+                    ajaxCallCount--;
+                    if (ajaxCallCount === 0) {
+                        AjaxHelper.HideIndicator();
+                    }
+                }
+            });
+
+            $(document).ajaxError(function (event, jqxhr, settings, thrownError) {
+                if (jqxhr.status == '401') {
+                    ajaxError401RedirectInProgress = true;
+                    window.location = '/';
+                }
+            });
+
+            kendo.culture("hu-HU");
+
+            $.validator.addMethod(
+                "date",
+                function (value, element) {
+                    return this.optional(element) || (kendo.parseDate(value) != null);
+                }
+            );
+
+            $.validator.addMethod(
+                "min",
+                function (value, element, param) {
+                    var floatValue = kendo.parseFloat(value);
+                    return this.optional(element) || floatValue >= param;
+                }
+            );
+
+            $.validator.addMethod(
+                "max",
+                function (value, element, param) {
+                    var floatValue = kendo.parseFloat(value);
+                    return this.optional(element) || floatValue <= param;
+                }
+            );
+
+            if ("5386" !== "5386") {
+                setTimeout(function () {
+                    $(".main-header, .selectTanev *").addClass("kovTanevBackgound");
+                }, 0);
+            }
+
+            $.validator.addMethod(
+                "requireddropdown",
+                function (value, element, param) {
+                    var numberRegex = /^\d+$/;
+                    return numberRegex.test(value);
+                }
+            );
+
+            $.validator.addMethod(
+                "daterange",
+                function (value, element, param) {
+                    try {
+                        var parts = value.split('.');
+                        var date = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+                        var minParts = ("1/1/1900").split('/');
+                        var maxPatrs = ("1/1/2100").split('/');
+                        if (date >= new Date(Date.UTC(minParts[2], minParts[1] - 1, minParts[0]))
+                            && date <= new Date(Date.UTC(maxPatrs[2], maxPatrs[1] - 1, maxPatrs[0]))) {
+                            return true;
+                        }
+                    } catch (e) { }
+                    return this.optional(element) || false;
+                }
+            );
+
+            (function () {
+
+                // === Tanév sessionStorage inicializálás, fülök közti cookie-szinkron és eltérés-detekció ===
+
+                // A szerver által renderelt (a közös cookie-ból olvasott) kiválasztott tanév adatai.
+                // Teljes oldalbetöltésnél nincs X-Selected-TanevId header, ezért a szerver ezt a tanévet rendereli.
+                var serverSelectedTanevId = '5386';
+                var serverSelectedTanevSorszam = '50';
+                var serverSelectedTanevNev = '2025/2026';
+
+                var changeSelectedTanevUrl = '/Layout/ChangeSelectedTanev';
+
+                // A közös cookie titkosított, ezért a benne lévő tanévet kliensből nem tudjuk közvetlenül kiolvasni.
+                // Helyette localStorage-ban (ami minden fül között közös) követjük, melyik tanévet írta utoljára BÁRMELYIK
+                // fül a közös cookie-ba. Így egy fül fel tudja ismerni, hogy a cookie épp egy másik fül tanévét tükrözi.
+                var cookieTanevKey = 'KretaCookieSelectedTanevId';
+                var currentCookieTanevId = serverSelectedTanevId;
+                var cookieSyncInProgress = false;
+
+                // A közös cookie-ba épp beírt tanév rögzítése – erről a localStorage 'storage' eseményén a többi fül is értesül.
+                function rememberCookieTanev(tanevId) {
+                    currentCookieTanevId = tanevId.toString();
+                    try {
+                        localStorage.setItem(cookieTanevKey, currentCookieTanevId);
+                    } catch (e) {
+                        // localStorage nem elérhető (pl. privát böngészés) – a fülök közti jelzés kimarad, de a
+                        // betöltés-utáni biztonsági háló továbbra is helyesen kezeli a tanév-eltérést.
+                    }
+                }
+
+                // Ha egy másik fül átírja a közös cookie-t (tanévváltás vagy szinkron), itt értesülünk az új értékről.
+                $(window).on('storage', function (e) {
+                    var ev = e.originalEvent || e;
+                    if (ev.key === cookieTanevKey && ev.newValue) {
+                        currentCookieTanevId = ev.newValue;
+                    }
+                });
+
+                // Más modulok (pl. a dropdown-os tanévváltás responeOk-ja) is jelezni tudják a cookie új tanévét.
+                window.KretaTanevTabSync = { rememberCookieTanev: rememberCookieTanev };
+
+                // A bejelentkezést a szerver SessionId-ja azonosítja (login-kor mindig új Guid generálódik). Ha a fülben
+                // eltárolt SeenSessionId eltér a mostani szerver SessionId-tól, akkor friss bejelentkezés történt
+                // (pl. logout→login ugyanabban a fülben), vagy ez a fül első betöltése.
+                var serverSessionId = '27a32e6f-c6ea-4489-8559-4e5f322e02fa';
+                var seenSessionId = sessionStorage.getItem('SeenSessionId');
+                var ujBejelentkezesVagyElsoBetoltes = !sessionStorage.getItem('SelectedTanevId') || seenSessionId !== serverSessionId;
+
+                // Új fül / friss bejelentkezés esetén a szerver által renderelt (cookie szerinti) tanévvel inicializálunk,
+                // NEM az aktív tanévvel. Egy új fül megnyitása így nem írja át a közös cookie-t, ezért a forrás fülön
+                // nem keletkezik felesleges dupla oldalbetöltés. Friss bejelentkezéskor a cookie a LoginManager miatt
+                // amúgy is az aktív tanévet tartalmazza, így logout→login után mindig az aktív tanév lesz kiválasztva.
+                // Tab-duplikációnál viszont a SeenSessionId is másolódik és megegyezik a szerverivel, ezért a fül az
+                // örökölt (előző füles) tanévet tartja meg.
+                if (ujBejelentkezesVagyElsoBetoltes) {
+                    sessionStorage.setItem('SelectedTanevId', serverSelectedTanevId);
+                    sessionStorage.setItem('SelectedTanevSorszam', serverSelectedTanevSorszam);
+                    sessionStorage.setItem('SelectedTanevNev', serverSelectedTanevNev);
+                    sessionStorage.setItem('SeenSessionId', serverSessionId);
+                }
+
+                var storedTanevId = sessionStorage.getItem('SelectedTanevId');
+
+                // Betöltés-utáni eltérés-detekció (BIZTONSÁGI HÁLÓ): ha a fül a saját per-tab tanévétől eltérő tanévvel
+                // renderelődött (mert egy másik fül átírta a közös cookie-t), visszaállítjuk a saját tanévünket és újratöltünk.
+                // Üres fül init után storedTanevId == serverSelectedTanevId, ezért ez csak valódi eltérésnél fut le.
+                if (storedTanevId && storedTanevId !== serverSelectedTanevId) {
+                    AjaxHelper.DoPostQuery(
+                        changeSelectedTanevUrl, null,
+                        (function () {
+                            var postData = {};
+                            postData['selectedTanevId'] = parseInt(storedTanevId);
+                            return postData;
+                        })(),
+                        function (data) {
+                            if (data.success) {
+                                sessionStorage.setItem('SelectedTanevId', data['selectedTanevId'].toString());
+                                sessionStorage.setItem('SelectedTanevSorszam', data['selectedTanevSorszam'].toString());
+                                sessionStorage.setItem('SelectedTanevNev', data['selectedTanevNev']);
+                                rememberCookieTanev(data['selectedTanevId']);
+                                location.reload();
+                            }
+                        }
+                    );
+                } else {
+                    // A fül a saját tanévével renderelődött → a közös cookie jelenleg ezt a tanévet tükrözi, rögzítjük.
+                    rememberCookieTanev(serverSelectedTanevId);
+                }
+
+                // Proaktív szinkron: amikor a fül újra aktívvá/láthatóvá válik, és a közös cookie időközben egy MÁSIK fül
+                // tanévét vette fel, még a felhasználó következő művelete (teljes oldalbetöltés) ELŐTT visszaállítjuk a
+                // közös cookie-t erre a fülre jellemző tanévre – reload NÉLKÜL. Így a következő navigáció már a helyes
+                // tanévvel renderelődik, és nem keletkezik dupla oldalbetöltés.
+                function syncCookieToTab() {
+                    var stored = sessionStorage.getItem('SelectedTanevId');
+                    var seenSessionIdForSync = sessionStorage.getItem('SeenSessionId');
+                    // Ha ez a fül egy régebbi bejelentkezési sessionhöz tartozik, ne írja vissza a tanévet
+                    // az aktuális (újabb) session cookie-jába.
+                    if (!seenSessionIdForSync || seenSessionIdForSync !== serverSessionId) {
+                        return;
+                    }
+                    if (cookieSyncInProgress || !stored || stored === currentCookieTanevId) {
+                        return;
+                    }
+                    cookieSyncInProgress = true;
+                    AjaxHelper.DoPostQuery(
+                        changeSelectedTanevUrl, null,
+                        (function () {
+                            var postData = {};
+                            postData['selectedTanevId'] = parseInt(stored);
+                            return postData;
+                        })(),
+                        function (data) {
+                            // A szerver success=false esetben is frissítheti a kiválasztott tanév cookie-értékét,
+                            // ezért a kliens oldali cookie-követést itt is szinkronban tartjuk.
+                            if (data && data['selectedTanevId']) {
+                                rememberCookieTanev(data['selectedTanevId']);
+                            }
+                        },
+                        null,
+                        function () { cookieSyncInProgress = false; }
+                    );
+                }
+
+                $(document).on('visibilitychange', function () {
+                    if (document.visibilityState === 'visible') {
+                        syncCookieToTab();
+                    }
+                });
+                $(window).on('focus', syncCookieToTab);
+            })();
+        });
+
+        var MasterLayoutHelper = (function () {
+            var masterLayoutHelper = function () { };
+            masterLayoutHelper.changeSelectedTanev = function () {
+                var postData = {};
+                postData['selectedTanevId'] = parseInt($("#selectTanevCombo").val());
+                AjaxHelper.DoPostQuery("/Layout/ChangeSelectedTanev", null, postData, responeOk);
+            }
+
+            masterLayoutHelper.popUpSajatAdatlapWindow = function () { AjaxHelper.DoPost(UrlHelper.SajatAdatlapPopUp, null, function (data) { openPopUp('Szem&#233;lyes adatlap', data) }) };
+
+            masterLayoutHelper.checkNeedDashboardPopup = function () { checkNeedDashboardPopup(); };
+
+            function openPopUp(title, data) {
+                var config = KretaWindowHelper.getWindowConfigContainer();
+                config.title = title;
+                config.content = data;
+                config.width = "85%";
+                config.height = "85%";
+
+                var modal = KretaWindowHelper.createWindow("SzemelyesAdatlapWindow", config);
+                KretaWindowHelper.openWindow(modal, true);
+            }
+
+            function responeOk(data) {
+                // A ChangeSelectedTanev a szerveren mindig beállítja a közös cookie-t a választott tanévre (success-tól
+                // függetlenül), ezért mindkét ágban jelezzük a többi fülnek az új cookie-tanévet (localStorage).
+                if (window.KretaTanevTabSync) {
+                    window.KretaTanevTabSync.rememberCookieTanev(data['selectedTanevId']);
+                }
+                if (data.success) {
+                    // Sikeres váltás után a kliens oldali tanév állapotot is frissítjük.
+                    sessionStorage.setItem('SelectedTanevId', data['selectedTanevId'].toString());
+                    sessionStorage.setItem('SelectedTanevSorszam', data['selectedTanevSorszam'].toString());
+                    sessionStorage.setItem('SelectedTanevNev', data['selectedTanevNev']);
+                    location.reload();
+                } else {
+                    // Ha az aktuális oldal nem érhető el a választott tanévben, a kiválasztott tanévet
+                    // a redirect előtt a sessionStorage-ba is elmentjük, így a céloldalon a tanév-szinkron
+                    // rutin nem állítja vissza a korábbi tanévet (nem vész el a felhasználó választása).
+                    sessionStorage.setItem('SelectedTanevId', data['selectedTanevId'].toString());
+                    sessionStorage.setItem('SelectedTanevSorszam', data['selectedTanevSorszam'].toString());
+                    sessionStorage.setItem('SelectedTanevNev', data['selectedTanevNev']);
+                    location.href = "/Adminisztracio/RendszerHibaErtesites";
+                }
+            }
+
+            function checkNeedDashboardPopup() {
+                var needId = $('#popupId').val();
+                var needField = $('#popupAzonosito').val();
+
+                if (typeof (needId) !== 'undefined' && needId > 0
+                    && typeof (needField) !== 'undefined' && needField.length > 0) {
+                    var postData = { popupId: needId, egyediAzonosito: needField };
+                    AjaxHelper.DoPost(UrlHelper.DashboardPopup, postData, function (data) { openDashboardPopup($('#Name', data).val(), data); })
+                }
+            }
+
+            function openDashboardPopup(title, data, actions = []) {
+                var config = KretaWindowHelper.getWindowConfigContainer();
+                config.title = title;
+                config.content = data;
+                config.width = "auto";
+                config.height = "auto";
+                config.maxWidth = "50%";
+                config.actions = actions;
+
+                var modal = KretaWindowHelper.createWindow("popupId", config);
+                KretaWindowHelper.openWindow(modal, true);
+            }
+
+            masterLayoutHelper.popUpIskolaorUzenetKuldesWindow = function () {
+                AjaxHelper.DoPost(UrlHelper.IskolaorUzenetKuldesPopup, null, function (data) {
+                    openDashboardPopup("Iskolaőr értesítése", data, ["Close"]);
+                });
+            };
+
+            return masterLayoutHelper;
+        })();
+    </script>
+
+    <script src="/bundles/modernizr?v=inCVuEFe6J4Q07A0AcRsbJic_UE5MwpRMNGcOtk94TE1"></script>
+
+    <script src="/bundles/js?v=LjzKHlZ8ETwgJkwBAFtvlNNRQnfxSs8CeSPfCZI69501"></script>
+
+    <script src="/bundles/kendo?v=JN2tGZtQ8y8-ZJxBEfLjj0dWaISpgzaZogFvSEaKMmw1"></script>
+
+    <script src="/bundles/KendoGrid?v=IjSzCsImR0UFS_kSMgfpnZH2yis4t0s7u3PLzfYf2hw1"></script>
+
+    <script src="/bundles/KretaImportGridHelper?v=SGlbrrv2r_Arwp8jTnN_odpKu-5oJwvJUOTV5DFdUFY1"></script>
+
+    <script src="/bundles/KretaWindowHelper?v=jFCLUNiEu6OM0ZZYX9-b2hGJAGDOeAkB3t5efygO1Fg1"></script>
+
+    <script src="/bundles/KretaDateTimeHelper?v=iZFD-QTBWKUqy4y2YDTUiCuOU6k7zYN-i3c24NwSngI1"></script>
+
+    <script src="/bundles/KretaComboBoxHelper?v=fPEwRFI2Vqe80XlVpM1T_-OHZRJWob_BzgMj8dBB19s1"></script>
+
+    <script src="/bundles/KretaMultiSelectHelper?v=QRzPeC-vpCFX8tLzlBJ15HEfTnY63a9pb6_IJvWlSmA1"></script>
+
+    <script src="/bundles/KretaCheckBoxHelper?v=PFGoL9ngSQVf_MtJmfhqxDC2GsVz2CfK6QtyXBIWl0w1"></script>
+
+    <script src="/bundles/KretaTooltipHelper?v=mdlQW441xjTL-mUTMXqpZxKM9ei22DV_AZ-CPEKhDb01"></script>
+
+    <script src="/bundles/KretaDropDownListHelper?v=QSMuCPnjwmWAoWFfp60VHEWefYKQAOL0W7EnDfccY381"></script>
+
+    <script src="/bundles/KretaPanelBarHelper?v=CExrsr9sFyspEOwXX55w2Tav30HL__AAb5pr7QDY4Ds1"></script>
+
+    <script src="/bundles/KretaRadioButtonListHelper?v=0PtyjFmcEpnmWudrrUQLJnUz-5tQWBNjvBrQdDUAlso1"></script>
+
+    <script src="/bundles/KretaOsztalybaSorolasHelper?v=pECbLXfEpnvq5VfMO1XHTJWAWhUg1ocw5Rdq-3-EELw1"></script>
+
+    <script src="/bundles/KretaWizard?v=dsxI2jU8QgcLgszkCTLXqq2g_WRxqpB-y5lSSmxI2ik1"></script>
+
+    <script src="/bundles/KretaNumericHelper?v=sVucPlJXJl7KIGvxM4Ex7haz2lwoXFa4aHLjAGQjMqw1"></script>
+
+    <script src="/bundles/KendoNotification?v=UhgUl4UV12Mpo4bva1ofmruhM0pZPw6zr5NxlM40plk1"></script>
+
+
+
+    <link href="/Content/TanuloErtekelesCSS?v=LT_Rpk3IEU-935Aku95C5lkYEKB4iZTKSABgC9iXR501" rel="stylesheet"/>
+
+    <script type="text/javascript">
+        var GlobalSystemParams = {};
+        GlobalSystemParams.SuccessFeedBackWindowNeeded = CommonUtils.parseBool("False");
+        GlobalSystemParams.IdpLoginEnabled = CommonUtils.parseBool("True");
+    </script>
+</head>
+<body>
+    <input name="__RequestVerificationToken" type="hidden" value="PwS0IZEb98X9zDj1OpZWahcewNOIU59AexgDJzdkP3RScwzW_Bjvi-8ZAnqnyOC9Oj2aJWZgCpFcwrfFSSapbJzmZ8mFX28K_PzL6uZfXyTu_ycICRbPkq63CXrD439w5W9JEoaIedKqJGiio4G5rQ2" />
+
+    <script>
+        // Iskolaőr üzenetküldéséhez kell
+        var firebaseConfig = {
+            apiKey: "AIzaSyBztLi3HebGmms_JaiP-gMK0eDdMlZ5fx8",
+            authDomain: "kreta-iskolaor.firebaseapp.com",
+            databaseURL: "https://kreta-iskolaor.firebaseio.com",
+            projectId: "kreta-iskolaor",
+            storageBucket: "kreta-iskolaor.appspot.com",
+            messagingSenderId: "1011319855684",
+            appId: "1:1011319855684:web:4a822f071aaa48e4b33a11",
+            //measurementId: "G-4N29KXY0J2",
+        };
+        firebase.initializeApp(firebaseConfig);
+        //firebase.analytics();
+    </script>
+
+    <div id="KretaProgressBar" class="modalBckgroundMain" style="display: block;">
+        <img id="bodyOverLayImg" src="/App_Themes/New_Common_Images/loading2.gif" alt="Folyamatban">
+    </div>
+
+    <script id="kendoTooltip-defaultTemplate" type="text/x-kendo-template"><div class='kendoTooltip defaultKendoTooltip'>
+    <table>
+        <tr>
+            <td style="max-width: 600px;word-break:break-all;font-weight: bolder;">#:target.data('tooltiptext')#</td>
+        </tr>
+    </table>
+</div></script>
+
+
+
+
+<script type="text/javascript">
+    function popupCheck() {
+        MasterLayoutHelper.checkNeedDashboardPopup();
+    }
+</script>
+
+<script type="text/javascript">
+    var deleteCookie = function (name) {
+        $.cookie(name, null, { path: '/' });
+    };
+
+    function setCookie(actDate, frequencyRate) {
+        actDate.setTime(actDate.getTime() + (frequencyRate));
+        $.cookie("EUgyUzenetekRecheck", actDate.getTime(), { expires: actDate, secure: true });
+
+        var newDate = new Date();
+        var difference = actDate - newDate.getTime();
+
+        setTimeout(function () {
+            EUgyCall();
+        }, difference);
+    };
+
+    function setCookieFrissitesDatum(actDate, frequencyRate) {
+        actDate.setTime(actDate.getTime() + (frequencyRate));
+        $.cookie("FrissitesiDatum", actDate.getTime(), { expires: actDate, secure: true });
+
+        var newDate = new Date();
+        var difference = actDate - newDate.getTime();
+
+        setTimeout(function () {
+            FrissitesiDatumCall();
+        }, difference);
+    };
+
+    function EUgyCall() {
+        if ("True" === "True") {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/Home/EUgyUzenetekRecheck", true);
+            xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+            xhr.onreadystatechange = function () {
+                if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                    EUgyCallSuccess(this.responseText);
+                }
+            }
+            xhr.send();
+        }
+    };
+
+    function FrissitesiDatumCall() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/Home/GetIsFrissitesWarrning", true);
+        xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+        xhr.onreadystatechange = function () {
+            if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                FrissitesiDatumCallSuccess(this.responseText);
+            }
+        }
+        xhr.send();
+    };
+
+    function EUgyCallSuccess(data) {
+        var obj = jQuery.parseJSON(data);
+        var date = new Date();
+        setCookie(date, obj.frequencyRate);
+
+        if (obj) {
+            var element = $(".messageCountBadge");
+            if (element.length == 0) {
+                setTimeout(function () { $(".messageCountBadge").attr('data-badge', obj.cnt);  }, 2000);
+            }
+            else {
+                $(".messageCountBadge").attr('data-badge', obj.cnt);
+            }
+        }
+    };
+
+    var interval = 0;
+
+    function FrissitesiDatumCallSuccess(data) {
+        var obj = jQuery.parseJSON(data);
+        var date = new Date();
+        setCookieFrissitesDatum(date, obj.frequencyRate);
+
+        if (obj != null && obj.isFrissites) {
+            $("#frissitesDatumDiv").show();
+            var duration = obj.duration;
+
+            if (duration <= 900 && duration >= 300) {
+                $(".main-header, #frissitesDatumDiv").css("background", "#FFECC7"); $(".selectTanev span span").css("background", "#FFECC7");
+            }
+            if (duration <= 300) {
+                $(".main-header, #frissitesDatumDiv").css("background", "#FFBFC4"); $(".selectTanev span span").css("background", "#FFBFC4");
+            }
+
+            var countDownTimer = 0;
+            var actualTime = duration;
+            resetInterval();
+            interval = setInterval(function () {
+                var minutes = parseInt(actualTime / 60, 10);
+                var seconds = parseInt(actualTime % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+                $(".frissitesDatumText").text(minutes + ":" + seconds);
+                countDownTimer = countDownTimer + 1;
+                actualTime = duration - countDownTimer;
+
+                if (actualTime == 900) { $(".main-header, #frissitesDatumDiv").css("background", "#FFECC7"); $(".selectTanev span span").css("background", "#FFECC7"); KretaWindowHelper.notification("A Kr&#233;ta rendszer friss&#237;t&#233;s&#233;ig visszamarad&#243; idő 15 perc! K&#233;rj&#252;k, mentse el az eddig felvitt adatait!", "warning"); }
+                if (actualTime == 600) { $(".main-header, #frissitesDatumDiv").css("background", "#FFECC7"); $(".selectTanev span span").css("background", "#FFECC7"); KretaWindowHelper.notification("A Kr&#233;ta rendszer friss&#237;t&#233;s&#233;ig visszamarad&#243; idő 10 perc! K&#233;rj&#252;k, mentse el az eddig felvitt adatait!", "warning"); }
+                if (actualTime == 300) { $(".main-header, #frissitesDatumDiv").css("background", "#FFBFC4"); $(".selectTanev span span").css("background", "#FFBFC4"); KretaWindowHelper.notification("A Kr&#233;ta rendszer friss&#237;t&#233;s&#233;ig visszamarad&#243; idő 5 perc! K&#233;rj&#252;k, mentse el az eddig felvitt adatait!", "error"); }
+            }, 1000);
+        }
+        else {
+            $("#frissitesDatumDiv").hide();
+        }
+    };
+
+    function resetInterval() {
+        clearInterval(interval);
+        interval = 0;
+    }
+
+    $(document).ready(function () {
+        deleteCookie('EUgyUzenetekRecheck');
+        EUgyCall();
+
+        deleteCookie('FrissitesiDatum');
+        FrissitesiDatumCall();
+    });
+</script>
+
+<script id="UserMenuTemplate" type="text/x-jQuery-tmpl">
+    <div class="usermenu">
+            <div class="pull-right topnotif">
+                <div title="Term&#233;kport&#225;l">
+                    <a href="/Nyomtatvanyok/Termekportal">
+                        <i class="fa fa-question"></i>
+                    </a>
+                </div>
+            </div>
+        <div class="pull-right topnotif">
+            <div title="KR&#201;TA Tud&#225;sb&#225;zis">
+
+                <a target="_blank" href="https://tudasbazis.ekreta.hu/"><i class="fa fa-book"></i></a>
+            </div>
+        </div>
+                <div class="pull-right topnotif">
+                    <div title="e-Learning">
+                        <a href="/Adminisztracio/ELearning">
+                            <i class="fa fa-tasks"></i>
+                        </a>
+                    </div>
+                </div>
+                            <div class="pull-right topnotif">
+                <div title="&#220;zenetek">
+                    <a href="/Home/Uzenetek" target="_blank">
+                        <i class="fa fa-envelope-o messageCountBadge" data-badge="${MessageCount}"></i>
+                    </a>
+                </div>
+            </div>
+                    <div class="pull-right topnotif disabledMenuItem">
+                <div title="&#201;rtes&#237;t&#233;sek">
+                    <a href="${EventUrl}">
+                        <i class="fa fa-bell-o" data-badge="${EventCount}"></i>
+                    </a>
+                </div>
+            </div>
+                {%if AdminHomePageUrl != "" %}
+            <div class="pull-right topnotif">
+                <div title="Rendszer&#252;zenetek">
+                    <a href="${AdminHomePageUrl}">
+                        <i class="fa fa-exclamation-triangle"></i>
+                    </a>
+                </div>
+            </div>
+        {%/if%}
+        <div class="dropdown" title="Profil men&#252;">
+            <button class="userbar dropdown-toggle" type="button" id="usermenu_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                <div class="username">
+                    <p class="headeruserNameSpan xs-username sm-userName md-userName lg-userName">${UserName}</p>
+                    <p id="usermenu_timer" role="timer" aria-live="off" class="usermenu_timer"></p>
+                </div>
+
+                <div class="userimg-sm ">
+                    <img class="userimg-sm" style="border-width: 0px;" alt="" src="${ProfilImgSrc}" />
+                </div>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="usermenu_dropdown">
+                {%each(i, menu) UserMenuItems%}
+                <li>
+                    <a href="${menu.Url}" onclick="${menu.ClientAction}">
+                        <i class="fa ${menu.CssClass}"></i>
+                        <span>${menu.Name}</span>
+                    </a>
+                </li>
+                {%/each%}
+            </ul>
+        </div>
+        <div class="pull-right topnotif hidden">
+            <div title="Popup">
+                <input id="popupId" type="hidden" value="${NeedPopupId}" />
+                <input id="popupAzonosito" type="hidden" value="${NeedPopupAzonosito}" />
+                ${ popupCheck() }
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript">
+    var Globalization = {
+        Siker: "Siker",
+        HibaSikeresenLejelentve: "Hiba sikeresen lejelentve!",
+        Bejelentéseim: "Bejelentéseim)",
+        UjHibabejelentes: "Új hibabejelentés",
+        Igen: "Igen",
+        Nem: "Nem",
+        Vissza: "Vissza",
+        GridAdatvesztesFigyelmeztetes: "A művelettel minden kitöltött tartalom elvész!",
+        Hiba: "Hiba",
+        MunkamenetLejar: "A munkamenet hamarosan lejár, folytatáshoz kérem kattintson a \"Rendben\" gombra.",
+        Figyelem: "Figyelem",
+        KeresesFigyelmeztetes: "A keresési feltételek megváltoztak! Frissítéshez kattintson a keresés gombra!",
+        Folytatas: "Folytatás",
+        Megsem: "Mégse",
+        TovabbiInfo: "További információk",
+        Hibabejelentese: "Hiba bejelentése",
+        Ora: "Óra",
+        MunkaHet: "Munkahét",
+        SikeresMentes: "A művelet sikeresen megtörtént!",
+        Rendben: "Rendben",
+        Kerdes: "Kérdés",
+        OsztalyCsoportbaSorolasModositasFigyelmeztetes: "Ha módosítja a célcsoportot/osztályt mentés előtt, akkor a módosításai el fognak veszni!",
+        OsztalybontottCsoportOsztalyNemEgyezik: "Osztálybontott csoportba csak akkor lehet sorolni, ha az osztály megegyezik!",
+        MenteshezLegalabbEgyTanulo: "A mentéshez legalább egy tanulót ki kell választani!",
+        HianyzoKovTanev: "A rendszerben nem található meg jelenleg következő tanév, így a besorolás nem lehetséges!",
+        NincsTalalat: "Nincs találat",
+        NincsAdat: "Nincs adat",
+        ElsoOldal: "Első oldal",
+        UtolsoOldal: "Utolsó oldal",
+        KovetkezoOldal: "Következő oldal",
+        ElozoOldal: "Előző oldal",
+        TobbOldal: "Több oldal",
+        MunkaHetSzombattal: "Munkahét szombattal",
+        KotelezoMegadni: "Kötelező megadni",
+        SikertelenIskolaorUzenetKuldes: "Sikertelen iskolaőr üzenet küldés!",
+        SikeresIskolaorUzenetKuldes: "Sikeres iskolaőr üzenet küldés",
+        EgyesTanulokMarRendelkeznekKiAtsorolasiZaradekkalKerdes: "Egyes tanulók már rendelkeznek 'Ki- vagy átsorolási záradékkal! A most megadott záradékot az ő számukra is elmentsük, vagy csak azon tanulóknak, akiknek még nem rögzítettek 'Ki vagy átsorolási záradék'-ot?",
+        RogzitesMindenkinek: "Rögzítés mindenkinek",
+        RogzitesAkinekMegNincsen: "Rögzítés akiknek még nincsen"
+    };
+</script>
+
+    <div class="page-wrapper">
+        <div class="clearfix container-fluid" id="frissitesDatumDiv" style="display: none;">
+            <div class="row">
+                <div class="col-xs-12 col-sm-12" style="font-weight: bold; font-size: 16px;">
+                    <div style="text-align:center;">
+                        <span style="font-size: 13px;">A rendszer friss&#237;t&#233;se hamarosan kezdődik!</span>
+                        <span class="frissitesDatumText"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="main-header clearfix container-fluid main-header">
+            <div class="row">
+                <div class="col">
+                    <div class="leave-600-PixelRight IntezmenyNevContainer">
+                        <h3 class="brand-title ng-binding" style="margin-bottom: 0px;">
+                            <span id="layout_organizationName" class="IntezmenyNev wraptext"></span>
+                        </h3>
+                        <div style="clear: both;" class="selectTanev">
+2025/2026                        </div>
+                    </div>
+                    <div id="layout_userMenu" style="width: 570px; float: right;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="layout_navigationBar" class="main-menu clearfix">
+
+<nav class="navbar">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" id="layout_navbar_home" href="#"></a>
+            <p id="layout_organizationName2" class="orgnamesmallscreen"></p>
+            <div class="main-header2">
+                <div id="layout_userMenu2">
+                </div>
+            </div>
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#mb1_menudiv" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <span id="Menu_Menu">
+  <div id="mb1_menudiv" class="navbar-collapse collapse">
+    <ul id="mb1" class="nav navbar-nav" role="menubar">
+            <li role="menuitem" tabindex="0" aria-haspopup="true" class="dropdown  menu-icon menuwithoutarrow " onfocus="" onblur="">
+              
+
+
+
+
+        
+            <a href="/Orarend/InformaciokOrarend" target="">
+                    <i class='fa fa-calendar-check-o fa-2x'></i>
+                                <br />
+                <span>
+&#211;rarend                </span>
+            </a>
+        
+
+            </li>
+            <li role="menuitem" tabindex="0" aria-haspopup="true" class="dropdown menu-large menu-icon  " onfocus="" onblur="">
+              
+
+
+
+
+        <a href='javascript:void(0);' class='dropdown-toggle' data-toggle='dropdown'>
+                    <i class='fa fa-graduation-cap fa-2x'></i>
+                                <br />
+                <span>
+Oszt&#225;lyzatok                </span>
+            </a>
+        
+
+
+    <ul class="dropdown-menu megamenu row" role="menu" aria-hidden="true">
+                <li class="col-xs-4 col-sm-4">
+                    <ul>
+                        
+
+
+
+
+        <li class="nav-header red">
+
+&#201;rt&#233;kel&#233;s            </li>
+        
+
+                                    <li>
+                                        
+
+
+
+
+    
+            <a href="/TanuloErtekeles/Osztalyzatok" target="">
+                <span>
+Oszt&#225;lyzatok                </span>
+            </a>
+
+    
+
+                                    </li>
+                                    <li>
+                                        
+
+
+
+
+    
+            <a href="/TanuloErtekeles/OsztalyzatokFeleviErtesito" target="">
+                <span>
+F&#233;l&#233;vi &#233;rtes&#237;tő                </span>
+            </a>
+
+    
+
+                                    </li>
+                                    <li>
+                                        
+
+
+
+
+    
+            <a href="/TanuloErtekeles/OsztalyzatokEvvegiErtesito" target="">
+                <span>
+&#201;v v&#233;gi &#233;rtes&#237;tő                </span>
+            </a>
+
+    
+
+                                    </li>
+                    </ul>
+                </li>
+    </ul>
+            </li>
+            <li role="menuitem" tabindex="0" aria-haspopup="true" class="dropdown menu-large menu-icon  " onfocus="" onblur="">
+              
+
+
+
+
+        <a href='javascript:void(0);' class='dropdown-toggle' data-toggle='dropdown'>
+                    <i class='fa fa-spinner fa-2x'></i>
+                                <br />
+                <span>
+Mulaszt&#225;sok                </span>
+            </a>
+        
+
+
+    <ul class="dropdown-menu megamenu row" role="menu" aria-hidden="true">
+                <li class="col-xs-4 col-sm-4">
+                    <ul>
+                        
+
+
+
+
+        <li class="nav-header red">
+
+Mulaszt&#225;sok            </li>
+        
+
+                                    <li>
+                                        
+
+
+
+
+    
+            <a href="/Hianyzas/Hianyzasok" target="">
+                <span>
+K&#233;s&#233;sek, hi&#225;nyz&#225;sok                </span>
+            </a>
+
+    
+
+                                    </li>
+                                    <li>
+                                        
+
+
+
+
+    
+            <a href="/Hianyzas/InformaciokIgazolasok" target="">
+                <span>
+Igazol&#225;sok                </span>
+            </a>
+
+    
+
+                                    </li>
+                    </ul>
+                </li>
+    </ul>
+            </li>
+            <li role="menuitem" tabindex="0" aria-haspopup="true" class="dropdown menu-large menu-icon  " onfocus="" onblur="">
+              
+
+
+
+
+        <a href='javascript:void(0);' class='dropdown-toggle' data-toggle='dropdown'>
+                    <i class='fa fa-info-circle fa-2x'></i>
+                                <br />
+                <span>
+Inform&#225;ci&#243;k                </span>
+            </a>
+        
+
+
+    <ul class="dropdown-menu megamenu row" role="menu" aria-hidden="true">
+                <li class="col-xs-4 col-sm-4">
+                    <ul>
+                        
+
+
+
+
+        <li class="nav-header red">
+
+Inform&#225;ci&#243;k            </li>
+        
+
+                                    <li>
+                                        
+
+
+
+
+    
+            <a href="/Orarend/InformaciokTanorak" target="">
+                <span>
+Tan&#243;r&#225;k                </span>
+            </a>
+
+    
+
+                                    </li>
+                                    <li>
+                                        
+
+
+
+
+    
+            <a href="/TanuloErtekeles/InformaciokFeljegyzesek" target="">
+                <span>
+Feljegyz&#233;sek                </span>
+            </a>
+
+    
+
+                                    </li>
+                                    <li>
+                                        
+
+
+
+
+    
+            <a href="/Nyomtatvanyok/Nyomtatvanyok/TanuloiIndex" target="">
+                <span>
+&#201;rtes&#237;tők, bizony&#237;tv&#225;nyok                </span>
+            </a>
+
+    
+
+                                    </li>
+                                    <li>
+                                        
+
+
+
+
+    
+            <a href="/Feljegyzes/TanuloKozossegiSzolgalatai" target="">
+                <span>
+K&#246;z&#246;ss&#233;gi szolg&#225;lat                </span>
+            </a>
+
+    
+
+                                    </li>
+                                    <li>
+                                        
+
+
+
+
+    
+            <a href="/Tanulo/TanuloBejelentettSzamonkeresek" target="">
+                <span>
+Bejelentett sz&#225;monk&#233;r&#233;sek                </span>
+            </a>
+
+    
+
+                                    </li>
+                                    <li>
+                                        
+
+
+
+
+    
+            <a href="/LEPModul/TanuloLEP" target="">
+                <span>
+L&#225;z&#225;r Ervin Program                </span>
+            </a>
+
+    
+
+                                    </li>
+                                    <li>
+                                        
+
+
+
+
+    
+            <a href="/NEPModul/TanuloNEP" target="">
+                <span>
+Nemzeti Eml&#233;kezetpedag&#243;gia Program                </span>
+            </a>
+
+    
+
+                                    </li>
+                    </ul>
+                </li>
+    </ul>
+            </li>
+            <li role="menuitem" tabindex="0" aria-haspopup="true" class="dropdown  menu-icon menuwithoutarrow " onfocus="" onblur="">
+              
+
+
+
+
+        
+            <a href="/Tanulo/TanuloHaziFeladat" target="">
+                    <i class='fa fa-home fa-2x'></i>
+                                <br />
+                <span>
+H&#225;zi feladatok                </span>
+            </a>
+        
+
+            </li>
+            <li role="menuitem" tabindex="0" aria-haspopup="true" class="dropdown  menu-icon menuwithoutarrow " onfocus="" onblur="">
+              
+
+
+
+
+        
+            <a href="/Home/Uzenetek" target="_blank">
+                    <i class='fa fa-envelope fa-2x'></i>
+                                <br />
+                <span>
+&#220;zenetek                </span>
+            </a>
+        
+
+            </li>
+            <li role="menuitem" tabindex="0" aria-haspopup="true" class="dropdown  menu-icon menuwithoutarrow " onfocus="" onblur="">
+              
+
+
+
+
+        
+            <a href="/Home/DKT" target="_blank">
+                    <i class='fa fa-table fa-2x'></i>
+                                <br />
+                <span>
+DKT                </span>
+            </a>
+        
+
+            </li>
+            <li role="menuitem" tabindex="0" aria-haspopup="true" class="dropdown  menu-icon menuwithoutarrow " onfocus="" onblur="">
+              
+
+
+
+
+        
+            <a href="/Home/IFM" target="_blank">
+                    <i class='fa fa-globe fa-2x'></i>
+                                <br />
+                <span>
+Nyelvtanul&#225;s (IFM)                </span>
+            </a>
+        
+
+            </li>
+            <li role="menuitem" tabindex="0" aria-haspopup="true" class="dropdown menu-large menu-icon  " onfocus="" onblur="">
+              
+
+
+
+
+        <a href='javascript:void(0);' class='dropdown-toggle' data-toggle='dropdown'>
+                    <i class='fa fa-laptop fa-2x'></i>
+                                <br />
+                <span>
+Eszk&#246;z &#252;gyint&#233;z&#233;s                </span>
+            </a>
+        
+
+
+    <ul class="dropdown-menu megamenu row" role="menu" aria-hidden="true">
+                <li class="col-xs-4 col-sm-4">
+                    <ul>
+                        
+
+
+
+
+        <li class="nav-header red">
+
+Eszk&#246;z &#252;gyint&#233;z&#233;s            </li>
+        
+
+                                    <li>
+                                        
+
+
+
+
+    
+            <a href="/Adminisztracio/FeltarTanulo/Atjelentkezes" target="">
+                <span>
+&#193;tjelentkez&#233;s                </span>
+            </a>
+
+    
+
+                                    </li>
+                    </ul>
+                </li>
+    </ul>
+            </li>
+            <li role="menuitem" tabindex="0" aria-haspopup="true" class="dropdown menu-large menu-icon  " onfocus="" onblur="">
+              
+
+
+
+
+        <a href='javascript:void(0);' class='dropdown-toggle' data-toggle='dropdown'>
+                                    <i>
+                        <img src='/Content/content/images/factcheck.png' height="26" />
+                    </i>
+                <br />
+                <span>
+T&#201;R                </span>
+            </a>
+        
+
+
+    <ul class="dropdown-menu megamenu row" role="menu" aria-hidden="true">
+                <li class="col-xs-4 col-sm-4">
+                    <ul>
+                        
+
+
+
+
+        <li class="nav-header red">
+
+Teljes&#237;tm&#233;ny&#233;rt&#233;kel&#233;s            </li>
+        
+
+                                    <li>
+                                        
+
+
+
+
+    
+            <a href="/Tanulo/Kerdoiv" target="">
+                <span>
+K&#233;rdő&#237;vek                </span>
+            </a>
+
+    
+
+                                    </li>
+                    </ul>
+                </li>
+    </ul>
+            </li>
+    </ul>
+  </div>
+</span>
+
+    </div>
+</nav>
+        </div>
+
+        <div class="main-wrapper">
+            <div class="main-sidebar">
+                <div class="row">
+                    <div class="sidepanel-wrapper">
+                        <ul id="sidepanel_tabs">
+                            <li class="sidebar-tab-item">
+                                <span id="menucaption" class="head-sidebar-tab-item">
+        
+            Oszt&#225;lyzatok
+        
+</span>
+                            </li>
+                            <li id="searchPanelFul" class="sidebar-tab-item disabled ">
+                                <span >Szűrés</span>
+                            </li>
+                            <li id="tippekFul" class="sidebar-tab-item disabled" style="cursor: pointer;"
+                                ><span>Tipp</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="main-content">
+                <div class="content-header">
+                    <div class="favoriteIconContainer">
+                    </div>
+                </div>
+
+                <div id="layout_slidePanel" class="content-content" >
+                    <div class="sidebar-container">
+
+                                            </div>
+                    <div class="content-container">
+                        <div class="k-content">
+                            
+
+
+
+
+
+    <h3>&#193;ltal&#225;nos iskola</h3>
+<input data-val="true" data-val-number="The field TanuloId must be a number." id="TanuloId" name="TanuloId" type="hidden" value="565775" />    <div>
+        <div class="k-widget k-grid" clientTemplateUrl="/TanuloErtekeles/TanuloErtekelesByTanulo/TanuloErtekelesByTanuloGridDetail?OktatasiNevelesiFeladatId=1158&amp;NamePrefix=Osztalyzatok_1158" clientTemplateWholeDataRow="True" id="Osztalyzatok_1158TanuloErtekelesByTanuloGrid"><div class="k-header k-grid-toolbar k-grid-top">
+            <div class="kreta-pagerContainer">
+            <div class="kreta-pager k-pager-wrap k-grid-pager k-widget k-floatwrap btn-group" data-role="pager">
+                
+                
+                
+                
+                <button type="button" class="k-button k-button-icontext" title="Összes sor kinyitása/becsukása" href="javascript:void(0);" onClick="KretaGridHelper.openAllGrid()">
+                    <span class="k-icon k-i-kpi"></span>
+                </button>
+            </div>
+            </div></div><table class="TanuloErtekelesGrid"><colgroup><col style="width:42px" /><col /><col /><col /><col /><col /><col /><col /><col /><col /><col /><col /><col /><col /><col /><col /><col /><col /><col /></colgroup><thead class="k-grid-header"><tr><th class="k-header kretaRowNumberHeader" data-index="0" scope="col"><span class="k-link">#</span></th><th class="k-header" data-field="TantargyNev" data-index="1" data-title="Tantárgy" scope="col"><span class="k-link">Tantárgy</span></th><th class="k-header honap" data-field="Szeptember" data-index="2" data-title="09" scope="col"><span class="k-link">09</span></th><th class="k-header honap" data-field="Oktober" data-index="3" data-title="10" scope="col"><span class="k-link">10</span></th><th class="k-header honap" data-field="November" data-index="4" data-title="11" scope="col"><span class="k-link">11</span></th><th class="k-header honap" data-field="December" data-index="5" data-title="12" scope="col"><span class="k-link">12</span></th><th class="k-header honap" data-field="JanuarI" data-index="6" data-title="01/I" scope="col"><span class="k-link">01/I</span></th><th class="k-header honap" data-field="I" data-index="7" data-title="I" scope="col"><span class="k-link">I</span></th><th class="k-header honap" data-field="JanuarII" data-index="8" data-title="01/II" scope="col"><span class="k-link">01/II</span></th><th class="k-header honap" data-field="Februar" data-index="9" data-title="02" scope="col"><span class="k-link">02</span></th><th class="k-header honap" data-field="Marcius" data-index="10" data-title="03" scope="col"><span class="k-link">03</span></th><th class="k-header honap" data-field="Aprilis" data-index="11" data-title="04" scope="col"><span class="k-link">04</span></th><th class="k-header honap" data-field="Majus" data-index="12" data-title="05" scope="col"><span class="k-link">05</span></th><th class="k-header honap" data-field="Junius" data-index="13" data-title="06" scope="col"><span class="k-link">06</span></th><th class="k-header honap" data-field="Julius" data-index="14" data-title="07" scope="col"><span class="k-link">07</span></th><th class="k-header honap" data-field="Augusztus" data-index="15" data-title="08" scope="col"><span class="k-link">08</span></th><th class="k-header honap" data-field="II" data-index="16" data-title="II" scope="col"><span class="k-link">II</span></th><th class="k-header atlag" data-field="Atlag" data-index="17" data-title="Átlag" scope="col"><span class="k-link">Átlag</span></th><th class="k-header atlag szazalekoshead" data-field="AtlagSzazalek" data-index="18" data-title="Átlag (%)" scope="col"><span class="k-link">Átlag (%)</span></th><th class="k-header atlag" data-field="OsztalyAtlag" data-index="19" data-title="Osztályátlag" scope="col" style="display:none"><span class="k-link">Osztályátlag</span></th></tr></thead><tfoot class="k-grid-footer"><tr class="k-footer-template"><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td style="display:none">&nbsp;</td></tr></tfoot><tbody><tr class="k-no-data"><td colspan="19"></td></tr></tbody></table></div><script>
+	jQuery(function(){jQuery("#Osztalyzatok_1158TanuloErtekelesByTanuloGrid").kendoGrid({"dataBound":
+                        function(e) {
+                            KretaGridHelper.init(e);
+                            KretaTooltipHelper.setGridCellTooltip($(".kretaTooltipDefaultClass"), "#kendoTooltip-defaultTemplate");
+                            KretaDateTimeHelper.SetTimepicker();
+                            TanuloErtekelesByTanuloHelper.dataBoundAdditionalFunction(e);
+                        },"edit":function(){},"dataBinding":function() {
+                        var currrentRowNumber = 1;
+                        if (!CommonUtils.isUndefined(this.dataSource.page()) && !CommonUtils.isUndefined(this.dataSource.pageSize())) {
+                            currrentRowNumber = currrentRowNumber + (this.dataSource.page() - 1) * this.dataSource.pageSize();
+                        }
+                        Osztalyzatok_1158TanuloErtekelesByTanuloGridRowNumber = currrentRowNumber;
+                    },"columns":[{"title":"#","attributes":{"title":"#: Osztalyzatok_1158TanuloErtekelesByTanuloGridRowNumber #","class":"kretaEllipsis kretaRowNumber"},"headerAttributes":{"class":"kretaRowNumberHeader"},"width":"42px","template":"#= Osztalyzatok_1158TanuloErtekelesByTanuloGridRowNumber++ #"},{"title":"Tantárgy","headerAttributes":{"data-field":"TantargyNev","data-title":"Tantárgy"},"footerTemplate":"\u003cdiv class=\u0027HaviAtlagWrapper\u0027\u003e\u003c/div\u003e\u003cdiv class=\u0027HaviSzazalekAtlagWrapper\u0027\u003e\u003c/div\u003e","field":"TantargyNev","encoded":true,"editor":null},{"title":"09","attributes":{"class":"honap"},"headerAttributes":{"class":"honap","data-field":"Szeptember","data-title":"09"},"footerTemplate":"\u003cdiv class=\u0027ehatlag Szeptember_HaviAtlagWrapper\u0027\u003e\u003c/div\u003e\u003cdiv class=\u0027szhatlag Szeptember_HaviSzazalekAtlagWrapper\u0027\u003e\u003c/div\u003e","encoded":false,"field":"Szeptember","editor":null},{"title":"10","attributes":{"class":"honap"},"headerAttributes":{"class":"honap","data-field":"Oktober","data-title":"10"},"footerTemplate":"\u003cdiv class=\u0027ehatlag Oktober_HaviAtlagWrapper\u0027\u003e\u003c/div\u003e\u003cdiv class=\u0027szhatlag Oktober_HaviSzazalekAtlagWrapper\u0027\u003e\u003c/div\u003e","encoded":false,"field":"Oktober","editor":null},{"title":"11","attributes":{"class":"honap"},"headerAttributes":{"class":"honap","data-field":"November","data-title":"11"},"footerTemplate":"\u003cdiv class=\u0027ehatlag November_HaviAtlagWrapper\u0027\u003e\u003c/div\u003e\u003cdiv class=\u0027szhatlag November_HaviSzazalekAtlagWrapper\u0027\u003e\u003c/div\u003e","encoded":false,"field":"November","editor":null},{"title":"12","attributes":{"class":"honap"},"headerAttributes":{"class":"honap","data-field":"December","data-title":"12"},"footerTemplate":"\u003cdiv class=\u0027ehatlag December_HaviAtlagWrapper\u0027\u003e\u003c/div\u003e\u003cdiv class=\u0027szhatlag December_HaviSzazalekAtlagWrapper\u0027\u003e\u003c/div\u003e","encoded":false,"field":"December","editor":null},{"title":"01/I","attributes":{"class":"honap"},"headerAttributes":{"class":"honap","data-field":"JanuarI","data-title":"01/I"},"footerTemplate":"\u003cdiv class=\u0027ehatlag JanuarI_HaviAtlagWrapper\u0027\u003e\u003c/div\u003e\u003cdiv class=\u0027szhatlag JanuarI_HaviSzazalekAtlagWrapper\u0027\u003e\u003c/div\u003e","encoded":false,"field":"JanuarI","editor":null},{"title":"I","attributes":{"class":"honap kozepre"},"headerAttributes":{"class":"honap","data-field":"I","data-title":"I"},"footerTemplate":"\u003cdiv class=\u0027ehatlag I_HaviAtlagWrapper\u0027\u003e\u003c/div\u003e\u003c/div\u003e\u003cdiv class=\u0027szhatlag I_HaviSzazalekAtlagWrapper\u0027\u003e\u003c/div\u003e","encoded":false,"field":"I","editor":null},{"title":"01/II","attributes":{"class":"honap"},"headerAttributes":{"class":"honap","data-field":"JanuarII","data-title":"01/II"},"footerTemplate":"\u003cdiv class=\u0027ehatlag JanuarII_HaviAtlagWrapper\u0027\u003e\u003c/div\u003e\u003cdiv class=\u0027szhatlag JanuarII_HaviSzazalekAtlagWrapper\u0027\u003e\u003c/div\u003e","encoded":false,"field":"JanuarII","editor":null},{"title":"02","attributes":{"class":"honap"},"headerAttributes":{"class":"honap","data-field":"Februar","data-title":"02"},"footerTemplate":"\u003cdiv class=\u0027ehatlag Februar_HaviAtlagWrapper\u0027\u003e\u003c/div\u003e\u003cdiv class=\u0027szhatlag Februar_HaviSzazalekAtlagWrapper\u0027\u003e\u003c/div\u003e","encoded":false,"field":"Februar","editor":null},{"title":"03","attributes":{"class":"honap"},"headerAttributes":{"class":"honap","data-field":"Marcius","data-title":"03"},"footerTemplate":"\u003cdiv class=\u0027ehatlag Marcius_HaviAtlagWrapper\u0027\u003e\u003c/div\u003e\u003cdiv class=\u0027szhatlag Marcius_HaviSzazalekAtlagWrapper\u0027\u003e\u003c/div\u003e","encoded":false,"field":"Marcius","editor":null},{"title":"04","attributes":{"class":"honap"},"headerAttributes":{"class":"honap","data-field":"Aprilis","data-title":"04"},"footerTemplate":"\u003cdiv class=\u0027ehatlag Aprilis_HaviAtlagWrapper\u0027\u003e\u003c/div\u003e\u003cdiv class=\u0027szhatlag Aprilis_HaviSzazalekAtlagWrapper\u0027\u003e\u003c/div\u003e","encoded":false,"field":"Aprilis","editor":null},{"title":"05","attributes":{"class":"honap"},"headerAttributes":{"class":"honap","data-field":"Majus","data-title":"05"},"footerTemplate":"\u003cdiv class=\u0027ehatlag Majus_HaviAtlagWrapper\u0027\u003e\u003c/div\u003e\u003cdiv class=\u0027szhatlag Majus_HaviSzazalekAtlagWrapper\u0027\u003e\u003c/div\u003e","encoded":false,"field":"Majus","editor":null},{"title":"06","attributes":{"class":"honap"},"headerAttributes":{"class":"honap","data-field":"Junius","data-title":"06"},"footerTemplate":"\u003cdiv class=\u0027ehatlag Junius_HaviAtlagWrapper\u0027\u003e\u003c/div\u003e\u003cdiv class=\u0027szhatlag Junius_HaviSzazalekAtlagWrapper\u0027\u003e\u003c/div\u003e","encoded":false,"field":"Junius","editor":null},{"title":"07","attributes":{"class":"honap"},"headerAttributes":{"class":"honap","data-field":"Julius","data-title":"07"},"footerTemplate":"\u003cdiv class=\u0027ehatlag Julius_HaviAtlagWrapper\u0027\u003e\u003c/div\u003e\u003cdiv class=\u0027szhatlag Julius_HaviSzazalekAtlagWrapper\u0027\u003e\u003c/div\u003e","encoded":false,"field":"Julius","editor":null},{"title":"08","attributes":{"class":"honap"},"headerAttributes":{"class":"honap","data-field":"Augusztus","data-title":"08"},"footerTemplate":"\u003cdiv class=\u0027ehatlag Augusztus_HaviAtlagWrapper\u0027\u003e\u003c/div\u003e\u003cdiv class=\u0027szhatlag Augusztus_HaviSzazalekAtlagWrapper\u0027\u003e\u003c/div\u003e","encoded":false,"field":"Augusztus","editor":null},{"title":"II","attributes":{"class":"honap kozepre"},"headerAttributes":{"class":"honap","data-field":"II","data-title":"II"},"footerTemplate":"\u003cdiv class=\u0027ehatlag II_HaviAtlagWrapper\u0027\u003e\u003c/div\u003e\u003cdiv class=\u0027szhatlag II_HaviSzazalekAtlagWrapper\u0027\u003e\u003c/div\u003e","encoded":false,"field":"II","editor":null},{"title":"Átlag","attributes":{"class":"atlag kozepre"},"headerAttributes":{"class":"atlag","data-field":"Atlag","data-title":"Átlag"},"encoded":false,"field":"Atlag","format":"{0:0.00}","editor":null},{"title":"Átlag (%)","attributes":{"class":"atlag kozepre szazalekos"},"headerAttributes":{"class":"atlag szazalekoshead","data-field":"AtlagSzazalek","data-title":"Átlag (%)"},"encoded":false,"field":"AtlagSzazalek","format":"{0:0%}","editor":null},{"title":"Osztályátlag","attributes":{"class":"atlag kozepre"},"headerAttributes":{"class":"atlag","data-field":"OsztalyAtlag","data-title":"Osztályátlag"},"hidden":true,"encoded":false,"field":"OsztalyAtlag","format":"{0:0.00}","editor":null}],"excel":{"proxyURL":"/Layout/Excel_Export_Save","fileName":"Osztalyzatok_1158TanuloErtekelesByTanuloGrid Grid Export.xlsx","allPages":true,"filterable":true,"forceProxy":true},"scrollable":false,"editable":{"confirmation":"Are you sure you want to delete this record?","confirmDelete":"Delete","cancelDelete":"Cancel","mode":"popup","template":"\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"Atlag\"\u003e\u0026\\#193;tlag\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" data-val=\"true\" data-val-number=\"The field Átlag must be a number.\" data-val-required=\"The Átlag field is required.\" id=\"Atlag\" name=\"Atlag\" value=\"0\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"Atlag\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"AtlagSzazalek\"\u003e\u0026\\#193;tlag (%)\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" data-val=\"true\" data-val-number=\"The field Átlag (%) must be a number.\" data-val-required=\"The Átlag (%) field is required.\" id=\"AtlagSzazalek\" name=\"AtlagSzazalek\" value=\"0\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"AtlagSzazalek\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"TantargyNev\"\u003eTant\u0026\\#225;rgy\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" id=\"TantargyNev\" name=\"TantargyNev\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"TantargyNev\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"OsztalyAtlag\"\u003eOszt\u0026\\#225;ly\u0026\\#225;tlag\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" data-val=\"true\" data-val-number=\"The field Osztályátlag must be a number.\" data-val-required=\"The Osztályátlag field is required.\" id=\"OsztalyAtlag\" name=\"OsztalyAtlag\" value=\"0\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"OsztalyAtlag\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"ID\"\u003eID\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" id=\"ID\" name=\"ID\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"ID\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"SzuletesiDatum\"\u003eSz\u0026\\#252;let\u0026\\#233;si d\u0026\\#225;tum\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput data-val=\"true\" data-val-date=\"The field Születési dátum must be a date.\" id=\"SzuletesiDatum\" name=\"SzuletesiDatum\" type=\"text\" /\u003e\u003cscript\u003e\tjQuery(function(){jQuery(\"\\\\\\#SzuletesiDatum\").kendoDateTimePicker({\"format\":\"yyyy. MM. dd. H:mm\",\"min\":new Date(1900,0,1,0,0,0,0),\"max\":new Date(2099,11,31,0,0,0,0),\"interval\":30});});\u003c\\/script\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"SzuletesiDatum\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"Szeptember\"\u003e09\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" id=\"Szeptember\" name=\"Szeptember\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"Szeptember\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"Oktober\"\u003e10\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" id=\"Oktober\" name=\"Oktober\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"Oktober\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"November\"\u003e11\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" id=\"November\" name=\"November\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"November\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"December\"\u003e12\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" id=\"December\" name=\"December\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"December\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"JanuarI\"\u003e01/I\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" id=\"JanuarI\" name=\"JanuarI\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"JanuarI\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"I\"\u003eI\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" id=\"I\" name=\"I\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"I\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"JanuarII\"\u003e01/II\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" id=\"JanuarII\" name=\"JanuarII\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"JanuarII\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"Februar\"\u003e02\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" id=\"Februar\" name=\"Februar\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"Februar\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"Marcius\"\u003e03\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" id=\"Marcius\" name=\"Marcius\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"Marcius\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"Aprilis\"\u003e04\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" id=\"Aprilis\" name=\"Aprilis\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"Aprilis\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"Majus\"\u003e05\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" id=\"Majus\" name=\"Majus\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"Majus\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"Junius\"\u003e06\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" id=\"Junius\" name=\"Junius\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"Junius\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"Julius\"\u003e07\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" id=\"Julius\" name=\"Julius\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"Julius\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"Augusztus\"\u003e08\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" id=\"Augusztus\" name=\"Augusztus\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"Augusztus\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e\u003cdiv class=\"editor-label\"\u003e\u003clabel for=\"II\"\u003eII\u003c/label\u003e\u003c/div\u003e\u003cdiv class=\"editor-field\"\u003e\u003cinput class=\"k-textbox\" id=\"II\" name=\"II\" /\u003e \u003cspan class=\"field-validation-valid\" data-valmsg-for=\"II\" data-valmsg-replace=\"true\"\u003e\u003c/span\u003e\u003c/div\u003e","window":{"modal":true,"iframe":false,"draggable":true,"scrollable":true,"pinned":false,"title":"Edit","resizable":false,"actions":["Close"]},"create":true,"update":true,"destroy":true},"toolbar":{},"noRecords":true,"messages":{"noRecords":"Nincs találat"},"autoBind":false,"dataSource":{"type":(function(){if(kendo.data.transports['aspnetmvc-ajax']){return 'aspnetmvc-ajax';} else{throw new Error('The kendo.aspnetmvc.min.js script is not included.');}})(),"transport":{"read":{"url":"/api/TanuloErtekelesByTanuloApi/GetTanuloErtekelesByTanuloGridTanuloView","data":function(){ return { data: JSON.stringify({}) }; },"type":"GET"},"prefix":""},"serverPaging":true,"serverSorting":true,"serverFiltering":true,"serverGrouping":true,"serverAggregates":true,"filter":[],"requestStart":function(e) { setTimeout(function(e) { $(".k-loading-image").hide(); } )},"requestEnd":function(e) { KretaGridHelper.initToolBar(e, 'Osztalyzatok_1158TanuloErtekelesByTanuloGrid');  },"error":function(error) {
+                if (!CommonUtils.isNullOrUndefined(error) && error.status === 'customerror') {
+                    KretaWindowHelper.notification('A szolgáltatás nem elérhető.', 'error');
+                    return;
+                }
+                KretaWindowHelper.notification('Hiba történt az adatok betöltése közben.', 'error');
+            },"sync":function(){},"schema":{"data":"Data","total":"Total","errors":"Errors","model":{"id":"ID","fields":{"Atlag":{"type":"number"},"AtlagSzazalek":{"type":"number"},"TantargyNev":{"type":"string"},"OsztalyAtlag":{"type":"number"},"ID":{"type":"string"},"SzuletesiDatum":{"type":"date","defaultValue":null},"Szeptember":{"type":"string"},"Oktober":{"type":"string"},"November":{"type":"string"},"December":{"type":"string"},"JanuarI":{"type":"string"},"I":{"type":"string"},"JanuarII":{"type":"string"},"Februar":{"type":"string"},"Marcius":{"type":"string"},"Aprilis":{"type":"string"},"Majus":{"type":"string"},"Junius":{"type":"string"},"Julius":{"type":"string"},"Augusztus":{"type":"string"},"II":{"type":"string"}}}}},"detailTemplate":kendo.template(jQuery('#detailGrid-template').html())});});
+</script>
+    </div>
+
+<script id="detailGrid-template" type="text/x-kendo-template"></script>
+<script id="kendoTooltip-tanuloErtekelesTemplate" type="text/x-kendo-template"><div class='kendoTooltip' style='#=target.data('tooltipstyle')#'>
+        <div class='tooltipTanuloErtekeles'>#=target.data('tanuloertekeles')#</div>
+        <p class='tooltipText'>#:target.data('datum')#</p>
+        <p class='tooltipText'>#:target.data('tipusmod')#</p>
+        <p class='tooltipText'>#:target.data('ertekelestema')#</p>
+        <p class='tooltipText'>#:target.data('suly')#</p>
+        <p class='tooltipText'>#:target.data('ertekelonyomtatasinev')#</p>
+    </div></script>
+
+
+<script type="text/javascript">
+  var TanuloErtekelesHelper = (function () {
+    var tanuloErtekelesHelper = function () { };
+
+    tanuloErtekelesHelper.setMenuCaption = function (tipusId) {
+      var sideBarMenuCaptionText;
+      if (tipusId === "1518") {
+        sideBarMenuCaptionText = "Évközi";
+      } else if (tipusId === "1519") {
+        sideBarMenuCaptionText = "Félévi";
+      } else if (tipusId === "1520") {
+        sideBarMenuCaptionText = "Év végi";
+      } else {
+        sideBarMenuCaptionText = "Egyéb";
+      }
+      $("#menucaption").text(sideBarMenuCaptionText);
+    }
+
+    tanuloErtekelesHelper.setValueToGridSelectorControlAfterChangeDate = function (value, selectListSelector, valueControlSelector) {
+      var selectList = $(selectListSelector);
+      for (var i = 0; i < selectList.length; i++) {
+        if (selectList[i].attributes.val.nodeValue === value) {
+          selectList[i].classList.add('activebar');
+        }
+      }
+      $(valueControlSelector).val(value);
+    }
+
+    tanuloErtekelesHelper.changeColumnValues = function (gridName, selector, val) {
+      if (!CommonUtils.isNullOrEmpty(val)) {
+        $.each($("#" + gridName).find(selector + "[val='" + val + "']"), function () {
+          if (!$(this).hasClass("activebar")) {
+            $(this).click();
+          }
+        });
+      } else {
+        $.each($("#" + gridName).find(selector), function () {
+          if ($(this).hasClass("activebar")) {
+            $(this).click();
+          }
+        });
+      }
+    }
+
+    tanuloErtekelesHelper.setDetailGridRowAthuzas = function (gridName) {
+      var dataSource = KretaGridHelper.getKendoGridData(gridName).dataSource.data();
+      $.each(dataSource, function (index, value) {
+        if (value.Torolt_BOOL) {
+          $('#' + gridName).find('[data-uid= ' + value.uid + ']').addClass("kretaStrikedGridRow disabledItem");
+        }
+      });
+    }
+
+    tanuloErtekelesHelper.getNormalizedErtekelesSzoveg = function (ertekelesSzoveg) {
+      if (CommonUtils.isNullOrWhiteSpace(ertekelesSzoveg)) {
+        return null;
+      } else {
+        //NOTE: Ékezetek miatt kell, hogy ne legyen encode-olva.
+        var result = tanuloErtekelesHelper.sanitizeErtekelesSzoveg(CommonUtils.getNormalizedHtmlFromString(ertekelesSzoveg));
+        return result;
+      }
+    }
+
+    tanuloErtekelesHelper.sanitizeErtekelesSzoveg = function(text) {
+        let norm = text || "";
+        norm = norm.replace(/\<\s*script.*\>/i, "").replace(/\<\s*img.*\>/i, "");
+        return norm;
+    }
+
+    tanuloErtekelesHelper.setSzovegEditorOnPaste = function (szovegEditorSelector) {
+      var editor = $("div[id^='" + szovegEditorSelector + "']");
+      if (editor.length > 0) {
+        editor.on("paste", function (e) {
+          //NOTE: Cancel paste!
+          e.preventDefault();
+          var text = "";
+          if (e.clipboardData || e.originalEvent.clipboardData) {
+            text = (e.originalEvent || e).clipboardData.getData("text/plain");
+          } else if (window.clipboardData) {
+            text = window.clipboardData.getData("Text");
+          }
+
+          text = tanuloErtekelesHelper.getNormalizedErtekelesSzoveg(text);
+          if (document.queryCommandSupported("insertText")) {
+            document.execCommand("insertText", false, text);
+          } else {
+            document.execCommand("paste", false, text);
+          }
+        });
+      }
+    }
+
+    tanuloErtekelesHelper.setErtekelesNyelviesitesVisibility = function (tipusId, selector) {
+      if (CommonUtils.isNullOrUndefined(tipusId)) {
+        $(selector).removeClass("showNyelviesites").addClass("hideNyelviesites");
+      }
+      var nyelviesithetoTanuloErtekelesTipusIdArray = [1520];
+      if (nyelviesithetoTanuloErtekelesTipusIdArray.includes(parseInt(tipusId))) {
+        $(selector).removeClass("hideNyelviesites").addClass("showNyelviesites");
+      } else {
+        $(selector).removeClass("showNyelviesites").addClass("hideNyelviesites");
+      }
+    }
+
+    return tanuloErtekelesHelper;
+  })();
+
+    var HaviAtlagHelper = (function () {
+        var haviAtlagHelper = function () { };
+
+        haviAtlagHelper.setHaviAtlagok = function (grid) {
+
+            var isHaviAtlagShow = true;
+            var rows = grid.items();
+            if (isHaviAtlagShow && rows.length > 0) {
+                var szhaviAtlagWrapper = grid.element.find(".HaviSzazalekAtlagWrapper");
+                var haviAtlagWrapper = grid.element.find(".HaviAtlagWrapper");
+
+                // Ez nem egy szép megoldás, de nem akarom refaktorálni az egészet. Azért van rá szükség, mert mikor be van állítva egy osztályzat a tanulókhoz (és dátum váltás történik), 
+                // akkor ez a metódus az eredeti szándéknál jóval többször fut le, és a "haviAtlagWrapper.append" -rész fölöslegesen beszúrja a táblázat alján lévő (ErdemjegyekHaviAtlaga, SzazalekokHaviAtlaga) sort egy csomószor.
+                if (haviAtlagWrapper.text() != '') {
+                    return;
+                }
+
+                haviAtlagWrapper.append("&#201;rdemjegyek havi &#225;tlaga").css("min-height", "1.5em");
+                szhaviAtlagWrapper.append("Sz&#225;zal&#233;kok havi &#225;tlaga");
+
+                var haviAtlagArray = [];
+                var haviSzazalekAtlagArray = [];
+
+                rows.each(function () {
+                    var dataItem = grid.dataItem(this);
+
+                    fillHaviAtlagArray(haviAtlagArray, "Szeptember_HaviAtlag", dataItem.Szeptember_HaviAtlag);
+                    fillHaviAtlagArray(haviAtlagArray, "Oktober_HaviAtlag", dataItem.Oktober_HaviAtlag);
+                    fillHaviAtlagArray(haviAtlagArray, "November_HaviAtlag", dataItem.November_HaviAtlag);
+                    fillHaviAtlagArray(haviAtlagArray, "December_HaviAtlag", dataItem.December_HaviAtlag);
+                    fillHaviAtlagArray(haviAtlagArray, "JanuarI_HaviAtlag", dataItem.JanuarI_HaviAtlag);
+                    fillHaviAtlagArray(haviAtlagArray, "I_HaviAtlag", dataItem.I_HaviAtlag);
+                    fillHaviAtlagArray(haviAtlagArray, "JanuarII_HaviAtlag", dataItem.JanuarII_HaviAtlag);
+                    fillHaviAtlagArray(haviAtlagArray, "Februar_HaviAtlag", dataItem.Februar_HaviAtlag);
+                    fillHaviAtlagArray(haviAtlagArray, "Marcius_HaviAtlag", dataItem.Marcius_HaviAtlag);
+                    fillHaviAtlagArray(haviAtlagArray, "Aprilis_HaviAtlag", dataItem.Aprilis_HaviAtlag);
+                    fillHaviAtlagArray(haviAtlagArray, "Majus_HaviAtlag", dataItem.Majus_HaviAtlag);
+                    fillHaviAtlagArray(haviAtlagArray, "Junius_HaviAtlag", dataItem.Junius_HaviAtlag);
+                    fillHaviAtlagArray(haviAtlagArray, "Julius_HaviAtlag", dataItem.Julius_HaviAtlag);
+                    fillHaviAtlagArray(haviAtlagArray, "Augusztus_HaviAtlag", dataItem.Augusztus_HaviAtlag);
+                    fillHaviAtlagArray(haviAtlagArray, "II_HaviAtlag", dataItem.II_HaviAtlag);
+
+                    fillHaviSzazalekAtlagArray(haviSzazalekAtlagArray, "Szeptember_HaviSzazalekAtlag", dataItem.Szeptember_HaviSzazalekAtlag);
+                    fillHaviSzazalekAtlagArray(haviSzazalekAtlagArray, "Oktober_HaviSzazalekAtlag", dataItem.Oktober_HaviSzazalekAtlag);
+                    fillHaviSzazalekAtlagArray(haviSzazalekAtlagArray, "November_HaviSzazalekAtlag", dataItem.November_HaviSzazalekAtlag);
+                    fillHaviSzazalekAtlagArray(haviSzazalekAtlagArray, "December_HaviSzazalekAtlag", dataItem.December_HaviSzazalekAtlag);
+                    fillHaviSzazalekAtlagArray(haviSzazalekAtlagArray, "JanuarI_HaviSzazalekAtlag", dataItem.JanuarI_HaviSzazalekAtlag);
+                    fillHaviSzazalekAtlagArray(haviSzazalekAtlagArray, "I_HaviSzazalekAtlag", dataItem.I_HaviSzazalekAtlag);
+                    fillHaviSzazalekAtlagArray(haviSzazalekAtlagArray, "JanuarII_HaviSzazalekAtlag", dataItem.JanuarII_HaviSzazalekAtlag);
+                    fillHaviSzazalekAtlagArray(haviSzazalekAtlagArray, "Februar_HaviSzazalekAtlag", dataItem.Februar_HaviSzazalekAtlag);
+                    fillHaviSzazalekAtlagArray(haviSzazalekAtlagArray, "Marcius_HaviSzazalekAtlag", dataItem.Marcius_HaviSzazalekAtlag);
+                    fillHaviSzazalekAtlagArray(haviSzazalekAtlagArray, "Aprilis_HaviSzazalekAtlag", dataItem.Aprilis_HaviSzazalekAtlag);
+                    fillHaviSzazalekAtlagArray(haviSzazalekAtlagArray, "Majus_HaviSzazalekAtlag", dataItem.Majus_HaviSzazalekAtlag);
+                    fillHaviSzazalekAtlagArray(haviSzazalekAtlagArray, "Junius_HaviSzazalekAtlag", dataItem.Junius_HaviSzazalekAtlag);
+                    fillHaviSzazalekAtlagArray(haviSzazalekAtlagArray, "Julius_HaviSzazalekAtlag", dataItem.Julius_HaviSzazalekAtlag);
+                    fillHaviSzazalekAtlagArray(haviSzazalekAtlagArray, "Augusztus_HaviSzazalekAtlag", dataItem.Augusztus_HaviSzazalekAtlag);
+                    fillHaviSzazalekAtlagArray(haviSzazalekAtlagArray, "II_HaviSzazalekAtlag", dataItem.II_HaviSzazalekAtlag);
+                });
+                $("tfoot").hide();
+                $(".HaviSzazalekAtlagWrapper").hide();
+                $(".HaviAtlagWrapper").hide();
+                processHaviAtlagArray(grid, haviSzazalekAtlagArray, true);
+                processHaviAtlagArray(grid, haviAtlagArray);
+            }
+        }
+
+        function fillHaviAtlagArray(haviAtlagArray, honap, atlagErtekek) {
+            if (atlagErtekek != null) {
+                var atlagErtekekObj = CommonUtils.JSONparse(atlagErtekek);
+                if (atlagErtekekObj.haviAtlagErtekek != null) {
+                    if (!haviAtlagArray[honap]) {
+                        haviAtlagArray[honap] = [];
+                    }
+                    atlagErtekekObj.haviAtlagErtekek.forEach(a => haviAtlagArray[honap].push(a));
+                }
+            }
+        }
+
+        function fillHaviSzazalekAtlagArray(haviAtlagArray, honap, atlagErtekek) {
+            if (atlagErtekek != null) {
+                var atlagErtekekObj = CommonUtils.JSONparse(atlagErtekek);
+                if (atlagErtekekObj.haviSzazalekAtlagErtekek != null) {
+                    if (!haviAtlagArray[honap]) {
+                        haviAtlagArray[honap] = [];
+                    }
+                    atlagErtekekObj.haviSzazalekAtlagErtekek.forEach(a => haviAtlagArray[honap].push(a));
+                }
+            }
+        }
+
+        function processHaviAtlagArray(grid, haviAtlagArray, szazalekos = false) {
+            var hasRow = false;
+            for (var honap in haviAtlagArray) {
+                var atlagErtekek = haviAtlagArray[honap];
+                if (Array.isArray(atlagErtekek)) {
+                    hasRow = true;
+                    var sulyzottAtlag = calculateSulyzottAtlag(atlagErtekek);
+                    showHaviAtlag(grid, honap, sulyzottAtlag, szazalekos);
+                }
+            }
+            if (hasRow) {
+                $("tfoot").show();
+                if (szazalekos) {
+                    $(".HaviSzazalekAtlagWrapper").show();
+                }
+                else {
+                    $(".HaviAtlagWrapper").show();
+                }
+            }
+        }
+
+        function calculateSulyzottAtlag(ertekek) {
+            var szamlalo = ertekek.reduce((t, e) => t + e.ertekeles * e.suly, 0);
+            var nevezo = ertekek.reduce((t, e) => t + e.suly, 0);
+            var sulyzottAtlag = szamlalo / nevezo;
+            return sulyzottAtlag;
+        }
+
+        function showHaviAtlag(grid, honap, sulyzottAtlag, szazalekos = false) {
+            var wrapperClassName = "." + honap + "Wrapper";
+            var wrapper = grid.element.find(wrapperClassName);
+            if (szazalekos) {
+                wrapper.append("<p>" + parseInt(sulyzottAtlag) + "%</p>");
+            }
+            else {
+                var numberArray = sulyzottAtlag.toFixed(2).split(".");
+                wrapper.append("<p>" + numberArray[0] + "." + numberArray[1] + "</p>");
+            }
+        }
+
+        return haviAtlagHelper;
+    })();
+</script>
+
+
+<script type="text/javascript">
+
+    var TanuloErtekelesByTanuloHelper = (function () {
+        var tanuloErtekelesByTanuloHelper = function () { };
+
+        tanuloErtekelesByTanuloHelper.dataBoundAdditionalFunction = function (e) {
+            var tanuloErtekelesKendoTooltip = $(".tanuloErtekelesKendoTooltip");
+            KretaTooltipHelper.setTooltip(tanuloErtekelesKendoTooltip, "#kendoTooltip-tanuloErtekelesTemplate");
+
+            $("td.atlag").each(function () {
+                var atlagText = $(this).html();
+                if (!CommonUtils.isNullOrEmpty(atlagText)) {
+                    var atlag = parseFloat(atlagText);
+                    if (atlag < 2) {
+                        $(this).html("<span class='spanAtlagFigyelmeztetes'>" + atlagText + "</span>");
+                    }
+                }
+            });
+
+            if (e.sender.columns[16].hidden == false) {
+                var szazalekosStr = "";
+                $("td.atlag.szazalekos").each(function () {
+                    szazalekosStr += $(this).text();
+                });
+                if (szazalekosStr.length < 1) {
+                    e.sender.hideColumn(16);
+                }
+                else {
+                    e.sender.showColumn(16);
+                }
+            }
+            HaviAtlagHelper.setHaviAtlagok(e.sender);
+        }
+
+        return tanuloErtekelesByTanuloHelper;
+    })();
+
+    $(document).ready(function () {
+                
+                $("#Osztalyzatok_1158" + "TanuloErtekelesByTanuloGrid").addClass("justView");
+                var model = {
+                    tanuloId: "565775",
+                    oktatasiNevelesiFeladatId: "1158",
+                    isOsztalyAtlagMegjelenik: "False"
+                };
+                KretaGridHelper.refreshGridByObject("Osztalyzatok_1158" + "TanuloErtekelesByTanuloGrid", model);
+                
+
+        $(".k-window h3").addClass("title");
+    });
+
+</script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                window.onload = function () {
+                    var panelWidth = document.getElementById('sidepanel_tabs').offsetWidth;
+                    $('#sidepanel_tabs').css('top', panelWidth + "px");
+                    $('.content-content').css('min-height', panelWidth + "px");
+                };
+            </script>
+        </div>
+
+        <div class="main-footer1">
+        </div>
+        <div class="main-footer2">
+            Educational Development Informatikai Zrt.
+            - 2.177.103
+            - f8484c9f2c2065c222bc9bcbec7ef4dfffd8f2de
+            <div style="float: right;">
+                <a href="https://tudasbazis.ekreta.hu/pages/viewpage.action?pageId=4064926" target="_blank">Educational Development Informatikai Zrt. jogi nyilatkozata</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/bundles/kreta?v=GYKzczXhBjrHJnDhjQkEVTTiaqblsDzWddx349QQghM1"></script>
+
+    <script src="/bundles/KretaFileUpload?v=O3yBmNSM00l1xaJguJwZiFQgwUbrMHl7Gwp35lVNKaM1"></script>
+
+    <script src="/bundles/IskolaorUzenetKuldes?v=1TtnBLPq-sZsrSVFzHNiV_3r8NtOttnRmGjHFBjQl4o1"></script>
+
+    <script src="/bundles/RowBackgroundColor?v=j6B6_HiQeS_x2qof0f4_K2WyOQSMHX781gxMXpwlyOk1"></script>
+
+
+
+    <!--
+        branchName: Release_v2.177
+        commitNumber: f8484c9f2c2065c222bc9bcbec7ef4dfffd8f2de
+    -->
+</body>
+
+</html>
